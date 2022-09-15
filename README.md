@@ -18,11 +18,14 @@ A Python3 [implementation](https://github.com/excid-io/did-self-py)
 Identifiers", in DI2F: Decentralising the Internet with IPFS and Filecoin, IFIP Networking 2021 workshop](https://arxiv.org/abs/2105.08395)
 * Application of did:self in securing routing in Named Data Networking
 [N.Fotiou, Y. Thomas, V.A. Siris, G. Xylomenos and G.C. Polyzos, "Securing Named Data Networking routing using Decentralized Identifiers," in Proc. SARNET-21 workshop, IEEE International Conference on High Performance Switching and Routing (HPSR), Paris, France, June 2021](https://mm.aueb.gr/publications/12279f1a-8166-4560-aead-56dfe90df93f.pdf)
+* Application of did:self in securing IoT group communication
+[N. Fotiou, V.A. Siris, G. Xylomenos and G.C. Polyzos, "IoT Group Membership Management Using Decentralized Identifiers and Verifiable Credentials", in Future Internet, MDPI, vol. 4, iss. 6, 2022](https://www.mdpi.com/1999-5903/14/6/173)
 
 ## The did:self method 
 The name of this DID method is: `self`
 
-The method specific identifier is represented as the thumbprint of a JWK, e.g.,
+The method specific identifier is represented as the thumbprint of a JWK, 
+as defined in [RFC 7638](https://www.rfc-editor.org/rfc/rfc7638), e.g.,
 
 ```
 did:self:iQ9PsBKOH1nLT9FyhsUGvXyKoW00yqm_-_rVa3W7Cl0
@@ -60,6 +63,11 @@ the hash of the DID document.
 1. Verify that the current time is between the time defined by the `iat` and `exp` fields for the `proof'.
 1. Verify the signature of the `proof` using the `jwk` field of the header.
 
+## DID document resolution
+The DID document resolution process of did:self DID is application specific. Given that
+DID documents in did:self are self-certified there is no need for a secure registry.
+DID documents can be included in message exchanges, they can be stored in file
+system, or they can be provided as DNS records. 
 
 ## CRUD Operation Definitions
 CRUD operations are implemented by the users. 
