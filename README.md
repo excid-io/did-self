@@ -70,7 +70,8 @@ DID documents can be included in message exchanges, they can be stored in file
 system, or they can be provided as DNS records. 
 
 ## CRUD Operation Definitions
-CRUD operations are implemented by the users. 
+CRUD operations should implemented by the user. Our Python3 [implementation](https://github.com/excid-io/did-self-py)
+can be used for this purpose. 
 
 ### Create
 The Create operation initializes a did:self DID and creates a DID document. 
@@ -129,14 +130,44 @@ The following is the decoded proof payload
 
 
 ### Read
-The Read operation simply outputs the DID document, 
-the corresponding `proof`.
+The Read operation should output the DID document, 
+the corresponding `proof`. The DID document should be then validated using the process
+described in [DID document validation](#did-document-validation)
+
 
 ### Update
 With the update operation, the DID document and the `proof` are replaced
 with new ones
 
+### Deactivate
+Since there is no registry the deactivate method is not supported. Nevertheless,
+each DID document proof includes an expiration time and a DID document is not
+valid beyond this time. 
 
+## Security and Privacy Considerations
+
+### Security
+This method considers two types of cryptographic keys: the key that corresponds to the 
+identifier, which is used for generating the DID document proofs, and the keys used
+as verification methods. Although the same key can be used in both cases,
+it is recommended to use different keys so that verification keys can be rotated.
+
+A breached verification method key cannot be revoked. For this reason it is recommended
+to use short-lived proofs. Nevertheless, by leveraging key identifiers and the `iat`
+field of the proof a verifier can be hinted that a key in a DID document "replaces"
+a key included in an older, non-expired DID document. In particular, the following
+rule can be followed: if there are two DID documents, for the same DID, that include
+a verification method with the same `id` then the verification method included in
+the **newest** DID document replaces the verification method included in the older
+DID document.  
+
+This method  does not provide an 1:1 relationship between a did:self DID identifier and
+the corresponding DID document: there can be multiple valid DID documents for the same
+identifier. This is a design choice that enables applications that require identifier
+sharing, e.g., IoT group communication.
+
+### Privacy
+A did:self DID identifier can be used for correlating the actions of a user. 
 
 
 
