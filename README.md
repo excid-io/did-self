@@ -128,16 +128,19 @@ The following is the decoded proof payload
 }
 ```
 
+The DID document may include an arbitrary number of verification methods and relationships.
+The public key(s) used as verification methods do not have to be the same as the
+DID identifier, although using the same key is allowed. 
 
 ### Read
 The Read operation should output the DID document, 
-the corresponding `proof`. The DID document should be then validated using the process
+the corresponding `document proof`. The DID document should be then validated using the process
 described in [DID document validation](#did-document-validation)
 
 
 ### Update
-With the update operation, the DID document and the `proof` are replaced
-with new ones
+With the update operation, the DID document is replaced
+with a new one. A new `document proof` is also generated. 
 
 ### Deactivate
 Since there is no registry the deactivate method is not supported. Nevertheless,
