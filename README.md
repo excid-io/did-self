@@ -6,7 +6,8 @@
 did:self is a DID method that enables DID document management without registries. 
 A did:self identifier is the thumbprint of a JWK as defined in [RFC 7638](https://www.rfc-editor.org/rfc/rfc7638).
 The corresponding  DID document is protected by a "proof", which is a JSON Web Signature generated
-by the private key that corresponds to the did:self identifier.
+by the private key that corresponds to the did:self identifier. The payload of this signature
+is the DID document itself, which is then ``detached'' (see [Appendix F of RFC 7515](https://www.rfc-editor.org/rfc/rfc7515.html#appendix-F))
 
 A Python3 [implementation](https://github.com/excid-io/did-self-py)
 
@@ -20,6 +21,7 @@ Identifiers", in DI2F: Decentralising the Internet with IPFS and Filecoin, IFIP 
 [N.Fotiou, Y. Thomas, V.A. Siris, G. Xylomenos and G.C. Polyzos, "Securing Named Data Networking routing using Decentralized Identifiers," in Proc. SARNET-21 workshop, IEEE International Conference on High Performance Switching and Routing (HPSR), Paris, France, June 2021](https://mm.aueb.gr/publications/12279f1a-8166-4560-aead-56dfe90df93f.pdf)
 * Application of did:self in securing IoT group communication
 [N. Fotiou, V.A. Siris, G. Xylomenos and G.C. Polyzos, "IoT Group Membership Management Using Decentralized Identifiers and Verifiable Credentials", in Future Internet, MDPI, vol. 4, iss. 6, 2022](https://www.mdpi.com/1999-5903/14/6/173)
+* The [SNDS](https://mmlab-aueb.github.io/snds-site/) project that uses did:self
 
 ## The did:self method 
 The name of this DID method is: `self`
