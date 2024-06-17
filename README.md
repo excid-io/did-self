@@ -5,9 +5,9 @@
 ## About
 did:self is a DID method that enables DID document management without registries. 
 A did:self identifier is the thumbprint of a JWK as defined in [RFC 7638](https://www.rfc-editor.org/rfc/rfc7638).
-The corresponding  DID document is protected by a "proof", which is a JSON Web Signature generated
+The corresponding  DID document is protected by a JSON Web Signature generated
 by the private key that corresponds to the did:self identifier. The payload of this signature
-is the DID document itself, which is then ``detached'' (see [Appendix F of RFC 7515](https://www.rfc-editor.org/rfc/rfc7515.html#appendix-F))
+is the DID document itself.
 
 A Python3 [implementation](https://github.com/excid-io/did-self-py)
 
@@ -37,32 +37,21 @@ The DID document is a JSON-encoded file that must include at least
 the `id` property.  
 
 The integrity of a DID document is verified using a 
-`document proof`. A `document proof` is a compact encoded 
 [JSON Web Signature (JWS)](https://tools.ietf.org/html/rfc7515).
 
-The header of the proof incudes two fields:
+The header of the proof must include the `jwk` field, which is used as follows:
 
-* `alg` The algorithm used for generating the proof.
 * `jwk` The JWK that can be used for verifying the proof. The thumbprint of this key **must** match the did:self identifier 
 
-The payload of the proof is a JSON string that includes at least the following 
-fields: 
+The payload of the proof is the DID document.
 
-* `iat` The NumericDate (as defined in Section 2 of [RFC 7519](https://www.rfc-editor.org/rfc/rfc7519#section-2)) of 
-the time at which the proof was generated.
-* `exp` The NumericDate (as defined in Section 2 of [RFC 7519](https://www.rfc-editor.org/rfc/rfc7519#section-2)) of 
-the time at which the proof expires.
-* `s256` The base64url encoded hash of the DID document, calculated using SHA-256.
 
 ## DID document validation
-Given a did:self DID, a DID document and a `proof` any entity can attest whether
+Given a did:self DID, a DID document and the corresponding JWS any entity can attest whether
  or not the DID document is a 
 valid document for the given DID using the following protocol.
 
-1. Verify that the `s256` field of the payload of the `proof`contains 
-the hash of the DID document.
 1. Verify that the thumbprint of the `jwk` field of the header of `proof` is equal to the DID.
-1. Verify that the current time is between the time defined by the `iat` and `exp` fields for the `proof'.
 1. Verify the signature of the `proof` using the `jwk` field of the header.
 
 ## DID document resolution
@@ -77,14 +66,14 @@ can be used for this purpose.
 
 ### Create
 The Create operation initializes a did:self DID and creates a DID document. 
-The proof of the DID document is signed using the using the 
+The JWS of the DID document is signed using the using the 
 private key that corresponds to the did:self DID.
 
 The following is a valid DID document
 
 ```JSON
 {
-  "id": "did:self:3rdYsl79x51rfk8zMgQN7-1sStIro9cs0iUfNAqeElI",
+  "id": "did:self:t_Mi-DsXvoOwL8igf7mlu2VSAJIKqhKhWIZTrYAG8XI",
   "authentication": [
     {
       "id": "#key1",
@@ -92,21 +81,21 @@ The following is a valid DID document
       "publicKeyJwk": {
         "kty": "EC",
         "crv": "P-256",
-        "x": "5y9L_pOEyepZBP3HCcn0u7wFkTwFIL1qUUq-oFsRNJk",
-        "y": "lxDZvayjRUH4r1HghIg0ZoknlWyqaATwsWtJazcUCRw"
+        "x": "YOGmYaMKzwTFytWHN2hGC-2VpPqGqj_sDSckB2IvCgI",
+        "y": "k7iWuiXQlLXvROjdMA2WNHhGz0jxu6u41n83YupNteo"
       }
     }
   ]
 }
 ```
 
-The following is the corresponding proof
+The following is the corresponding proof in  Compact Serialization format with detached payload.
 
 ```
-eyJhbGciOiAiRVMyNTYiLCAiandrIjogeyJrdHkiOiAiRUMiLCAiY3J2IjogIlAtMjU2IiwgIngiOiAiNXk5TF9wT0V5ZXBaQlAzSENjbjB1N3dGa1R3RklMMXFVVXEtb0ZzUk5KayIsICJ5IjogImx4RFp2YXlqUlVINHIxSGdoSWcwWm9rbmxXeXFhQVR3c1d0SmF6Y1VDUncifX0.eyJpYXQiOiAxNjYyNzM0OTU1LCAiZXhwIjogMTY2MjczNjE1NSwgInMyNTYiOiAiMVN4TEZJSkNtaFg5UVlXQXZpQjV2UWhLeFhrMGFwSWVGU3FEY2tJUjZuYyJ9.C1NUMIRFJskWoHs1v1i99Ni1YLKQ26NK2EKaRCX-J8jbYRpAsuqk2RWVPkC6xIH19Q0pSkIqlpzx8Z5t7jcntw
+eyJhbGciOiAiRVMyNTYiLCAiandrIjogeyJrdHkiOiAiRUMiLCAiY3J2IjogIlAtMjU2IiwgIngiOiAiWU9HbVlhTUt6d1RGeXRXSE4yaEdDLTJWcFBxR3FqX3NEU2NrQjJJdkNnSSIsICJ5IjogIms3aVd1aVhRbExYdlJPamRNQTJXTkhoR3owanh1NnU0MW44M1l1cE50ZW8ifX0..T1WGz3wTmWLZer0_40hkGrZ6Qky_17dbR3y0G_kIsNvuLXlDhAdUoGnMitOGBYMN4J0vy91TPyqx0ENKTRY5aQ
 ```
 
-The following is the decoded proof header
+The following is the decoded JWS header
 
 ```JSON
 {
@@ -114,40 +103,28 @@ The following is the decoded proof header
   "jwk": {
     "kty": "EC",
     "crv": "P-256",
-    "x": "5y9L_pOEyepZBP3HCcn0u7wFkTwFIL1qUUq-oFsRNJk",
-    "y": "lxDZvayjRUH4r1HghIg0ZoknlWyqaATwsWtJazcUCRw"
+    "x": "YOGmYaMKzwTFytWHN2hGC-2VpPqGqj_sDSckB2IvCgI",
+    "y": "k7iWuiXQlLXvROjdMA2WNHhGz0jxu6u41n83YupNteo"
   }
 }
 ```
 
-The following is the decoded proof payload
-
-```JSON
-{
-  "iat": 1662734955,
-  "exp": 1662736155,
-  "s256": "1SxLFIJCmhX9QYWAviB5vQhKxXk0apIeFSqDckIR6nc"
-}
-```
 
 The DID document may include an arbitrary number of verification methods and relationships.
 The public key(s) used as verification methods do not have to be the same as the
 DID identifier, although using the same key is allowed. 
 
 ### Read
-The Read operation should output the DID document, 
-the corresponding `document proof`. The DID document should be then validated using the process
+The Read operation should output the DID document and JWS. The DID document should be then validated using the process
 described in [DID document validation](#did-document-validation)
 
 
 ### Update
 With the update operation, the DID document is replaced
-with a new one. A new `document proof` is also generated. 
+with a new one. A new JWS is also generated. 
 
 ### Deactivate
-Since there is no registry the deactivate method is not supported. Nevertheless,
-each DID document proof includes an expiration time and a DID document is not
-valid beyond this time. 
+Since there is no registry the deactivate method is not supported. 
 
 ## Security and Privacy Considerations
 
@@ -157,14 +134,7 @@ identifier, which is used for generating the DID document proofs, and the keys u
 as verification methods. Although the same key can be used in both cases,
 it is recommended to use different keys so that verification keys can be rotated.
 
-A breached verification method key cannot be revoked. For this reason it is recommended
-to use short-lived proofs. Nevertheless, by leveraging key identifiers and the `iat`
-field of the proof a verifier can be hinted that a key in a DID document "replaces"
-a key included in an older, non-expired DID document. In particular, the following
-rule can be followed: if there are two DID documents, for the same DID, that include
-a verification method with the same `id` then the verification method included in
-the **newest** DID document replaces the verification method included in the older
-DID document.  
+ 
 
 This method  does not provide an 1:1 relationship between a did:self DID identifier and
 the corresponding DID document: there can be multiple valid DID documents for the same
